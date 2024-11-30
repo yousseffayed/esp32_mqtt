@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS IoT WebSocket Client</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <h2>AWS IoT WebSocket Connection</h2>
+    <div id="status">Status: Not Connected</div>
+    <button id="sendButton">Send Message</button>
+    <div id="receivedMessage">Received Message: None</div>
+
+    <script>
+        // AWS IoT settings
+        const endpoint = 'aehnkcy6nec1e-ats.iot.eu-central-1.amazonaws.com';  // Your AWS IoT endpoint
+        const clientId = 'your-client-id';  // Use a unique client ID
+        const topic = 'hello';  // Topic to subscribe to and publish
+
+        // MQTT.js connection options
+        const connectOptions = {
+            clientId: clientId,
+            clean: true,
+            connectTimeout: 4000,
+            username: 'your-username',  // Optional: use if needed
+            password: 'your-password',  // Optional: use if needed
+            keepalive: 60,
+            reconnectPeriod: 1000,
+            rejectUnauthorized: false // Disable SSL cert validation
+        };
+
+        // WebSocket URL for AWS IoT
+        const mqttUrl = `wss://${endpoint}/mqtt`;
+
+        // Create MQTT client
+        const client = mqtt.connect(mqttUrl, connectOptions);
+
+        // On connect, subscribe to the topic
+        client.on('connect', function () {
+            document.getElementById('status').innerText = 'Status: Connected';
+            console.log('Connected to AWS IoT over WebSocket');
+            client.subscribe(topic, function (err) {
+                if (!err) {
+                    console.log('Subscribed to topic:', topic);
+                }
+            });
+        });
+
+        // On message received, update the UI
+        client.on('message', function (topic, message) {
+            document.getElementById('receivedMessage').innerText = `Received Message: ${message.toString()}`;
+            console.log('Received Message:', message.toString());
+        });
+
+        // Handle connection errors
+        client.on('error', function (err) {
+            document.getElementById('status').innerText = 'Status: Error - ' + err.message;
+            console.log('Error:', err);
+        });
+
+        // Send message to the topic when the button is clicked
+        document.getElementById('sendButton').addEventListener('click', function () {
+            const message = 'Hello from Web!';
+            console.log('Sending Message:', message);
+            client.publish(topic, message);
+        });
+    </script>
+</body>
+</html>
