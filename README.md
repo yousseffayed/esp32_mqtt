@@ -18,17 +18,12 @@ This example can be executed on any ESP32 board, the only required interface is 
 
 ### Configure the project
 
-* Open the project configuration menu (`idf.py menuconfig`)
-* Configure Wi-Fi or Ethernet under "Example Connection Configuration" menu. See "Establishing Wi-Fi or Ethernet Connection" section in [examples/protocols/README.md](../../README.md) for more details.
+* Open the project sdkconfig
+* Configure Wi-Fi ssid and password.
+* Replace your ca root certificate mqtt_eclipseprojects_io.pem, device certificate and private key with esp32.cert.pem and esp32.private.key respectively.
+* Edit the mqtt_event_handler to subscribe and publish to the required topic.
+* in the MQTT_EVENT_DATA case you can find the sent data in event->data, compare it and take actions.
 
-PEM certificate for this example could be extracted from an openssl `s_client` command connecting to mqtt.eclipseprojects.io.
-In case a host operating system has `openssl` and `sed` packages installed, one could execute the following command to download and save the root certificate to a file (Note for Windows users: Both Linux like environment or Windows native packages may be used).
-```
-echo "" | openssl s_client -showcerts -connect mqtt.eclipseprojects.io:8883 | sed -n "1,/Root/d; /BEGIN/,/END/p" | openssl x509 -outform PEM >mqtt_eclipse_org.pem
-```
-Please note that this is not a general command for downloading a root certificate for an arbitrary host;
-this command works with mqtt.eclipseprojects.io as the site provides root certificate in the chain, which then could be extracted
-with text operation.
 
 ### Build and Flash
 
